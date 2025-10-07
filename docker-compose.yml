@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mini-wallet:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - JWT_SECRET=your-super-secret-jwt-key-here
+      - ETHERSCAN_API_KEY=your-etherscan-api-key
+      - ALCHEMY_API_KEY=your-alchemy-api-key
+      - NETWORK=sepolia
+    volumes:
+      - ./database.sqlite:/app/database.sqlite
