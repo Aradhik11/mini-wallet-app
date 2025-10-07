@@ -324,26 +324,3 @@ curl -X POST http://localhost:4000/graphql \
   -d '{"query": "mutation { createWallet { id address network } }"}'
 ```
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support, email support@mini-wallet.com or create an issue on GitHub.
-
-## 🔮 Future Enhancements
-
-- Multi-blockchain support (Bitcoin, Polygon)
-- Hardware wallet integration
-- Advanced transaction analytics
-- Mobile app development
-- DeFi protocol integrations
