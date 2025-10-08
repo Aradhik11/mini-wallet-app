@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { EncryptedData } from '../types';
 
-const ALGORITHM = 'aes-256-gcm';
+const ALGORITHM = 'aes-256-cbc';
 const KEY_LENGTH = 32;
 const IV_LENGTH = 16;
 
@@ -12,27 +12,24 @@ class CryptoUtils {
 
   static encrypt(text: string, key: string): EncryptedData {
     const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipher(ALGORITHM, key);
-    cipher.setAAD(Buffer.from('wallet-encryption'));
+    const keyBuffer = crypto.scryptSync(key, 'salt', KEY_LENGTH);
+    const cipher = crypto.createCipher(ALGORITHM, keyBuffer);
     
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     
-    const tag = cipher.getAuthTag();
-    
     return {
       encrypted,
       iv: iv.toString('hex'),
-      tag: tag.toString('hex')
+      tag: ''
     };
   }
 
   static decrypt(encryptedData: string, key: string): string {
-    const { encrypted, iv, tag } = JSON.parse(encryptedData) as EncryptedData;
+    const { encrypted } = JSON.parse(encryptedData) as EncryptedData;
     
-    const decipher = crypto.createDecipher(ALGORITHM, key);
-    decipher.setAAD(Buffer.from('wallet-encryption'));
-    decipher.setAuthTag(Buffer.from(tag, 'hex'));
+    const keyBuffer = crypto.scryptSync(key, 'salt', KEY_LENGTH);
+    const decipher = crypto.createDecipher(ALGORITHM, keyBuffer);
     
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');

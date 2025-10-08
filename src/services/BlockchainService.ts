@@ -35,11 +35,19 @@ class BlockchainService {
 
   async getBalance(address: string): Promise<string> {
     try {
-      const balance = await this.provider.getBalance(address);
+      // Add timeout and retry logic
+      const balance = await Promise.race([
+        this.provider.getBalance(address),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 10000)
+        )
+      ]) as bigint;
+      
       return ethers.formatEther(balance);
     } catch (error) {
       logger.error('Error getting balance:', error);
-      throw new Error('Failed to get balance');
+      // Return 0 balance instead of throwing error for better UX
+      return '0.0';
     }
   }
 

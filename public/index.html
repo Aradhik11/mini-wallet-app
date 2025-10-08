@@ -75,26 +75,51 @@
         }
 
         async function graphqlRequest(query, variables = {}) {
-            const response = await fetch('/graphql', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                },
-                body: JSON.stringify({ query, variables })
-            });
+            console.log('Making GraphQL request:', { query: query.substring(0, 100) + '...', variables });
             
-            const result = await response.json();
-            if (result.errors) {
-                throw new Error(result.errors[0].message);
+            try {
+                const response = await fetch('/graphql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: JSON.stringify({ query, variables })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('GraphQL response:', result);
+                
+                if (result.errors) {
+                    throw new Error(result.errors[0].message);
+                }
+                return result.data;
+            } catch (error) {
+                console.error('GraphQL request failed:', error);
+                throw error;
             }
-            return result.data;
         }
 
         async function login() {
             try {
+                console.log('Login button clicked');
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
+                
+                console.log('Username:', username, 'Password length:', password.length);
+                
+                if (!username || !password) {
+                    showMessage('Please enter both username and password', 'error');
+                    return;
+                }
+                
+                showMessage('Logging in...', 'success');
                 
                 const data = await graphqlRequest(`
                     mutation Login($username: String!, $password: String!) {
@@ -105,6 +130,8 @@
                     }
                 `, { username, password });
                 
+                console.log('Login successful:', data);
+                
                 token = data.login.token;
                 localStorage.setItem('wallet-token', token);
                 
@@ -113,14 +140,30 @@
                 showMessage(`Welcome, ${data.login.user.username}!`, 'success');
                 loadWallets();
             } catch (error) {
+                console.error('Login error:', error);
                 showMessage(error.message, 'error');
             }
         }
 
         async function register() {
             try {
+                console.log('Register button clicked');
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
+                
+                console.log('Username:', username, 'Password length:', password.length);
+                
+                if (!username || !password) {
+                    showMessage('Please enter both username and password', 'error');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    showMessage('Password must be at least 6 characters', 'error');
+                    return;
+                }
+                
+                showMessage('Creating account...', 'success');
                 
                 const data = await graphqlRequest(`
                     mutation Register($username: String!, $password: String!) {
@@ -131,6 +174,8 @@
                     }
                 `, { username, password });
                 
+                console.log('Registration successful:', data);
+                
                 token = data.register.token;
                 localStorage.setItem('wallet-token', token);
                 
@@ -139,6 +184,7 @@
                 showMessage(`Account created! Welcome, ${data.register.user.username}!`, 'success');
                 loadWallets();
             } catch (error) {
+                console.error('Registration error:', error);
                 showMessage(error.message, 'error');
             }
         }
