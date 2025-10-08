@@ -29,7 +29,7 @@ const resolvers = {
     walletBalance: async (_: any, { walletId }: { walletId: string }, { userId }: GraphQLContext) => {
       if (!userId) throw new Error('Not authenticated');
       
-      validateInput(Joi.string().uuid().required(), walletId);
+      validateInput(Joi.object({ walletId: Joi.string().uuid().required() }), { walletId });
       
       return await WalletService.getWalletBalance(walletId, userId);
     },

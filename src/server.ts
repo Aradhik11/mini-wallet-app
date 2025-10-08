@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -31,7 +31,7 @@ async function startServer(): Promise<void> {
   app.use(limiter);
 
   // Health check endpoint
-  app.get('/health', (req, res) => {
+  app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
   });
 
@@ -58,8 +58,7 @@ async function startServer(): Promise<void> {
       
       return { userId };
     },
-    introspection: true,
-    playground: true
+    introspection: true
   });
 
   await server.start();

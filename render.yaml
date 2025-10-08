@@ -2,7 +2,7 @@ services:
   - type: web
     name: mini-wallet-app
     env: node
-    buildCommand: npm ci && npm run build && npm run migrate
+    buildCommand: npm install && npm run build && npm run migrate
     startCommand: npm start
     envVars:
       - key: NODE_ENV
