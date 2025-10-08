@@ -64,10 +64,10 @@ async function startServer(): Promise<void> {
   await server.start();
   server.applyMiddleware({ app: app as any, path: '/graphql' });
 
-  // Database connection
+  // Database connection and migration
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
+    await sequelize.sync({ force: false });
     logger.info('Database connected and synchronized');
   } catch (error) {
     logger.error('Database connection failed:', error);
