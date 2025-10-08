@@ -62,7 +62,7 @@ async function startServer(): Promise<void> {
   });
 
   await server.start();
-  server.applyMiddleware({ app, path: '/graphql' });
+  server.applyMiddleware({ app: app as any, path: '/graphql' });
 
   // Database connection
   try {
